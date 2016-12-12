@@ -66,7 +66,6 @@ public class ProjGradient extends Algorithm {
 	 */
 	private void check_feasible(Vector x) throws Exception {
 		int i;
-		double valContr;
 		boolean feasible = true;
 		Vector res = new Vector(A.mult(x));
 		
