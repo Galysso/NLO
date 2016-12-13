@@ -53,6 +53,8 @@ public class ProjGradient extends Algorithm {
 	Vector iter_vec;
 	// Les contraintes actives
 	ArrayList<Boolean> activeConstr;
+	// Direction de descente
+	Vector d;
 		
 
 	/**
@@ -117,7 +119,6 @@ public class ProjGradient extends Algorithm {
 	
 	/**
 	 * Check the active constraints
-	 * @return 
 	 * @return the list of booleans, true if the constraint is active, false otherwise
 	 */
 	private void setActiveConstraints() {
@@ -129,13 +130,22 @@ public class ProjGradient extends Algorithm {
 	}
 	
 	/**
+	 * Set the direction of the steepest descent of the current function at the current point
+	 */
+	private void setDirection() {
+		d = f.grad(iter_vec).minus();
+	}
+	
+	/**
 	 * Calculate the next iterate.
 	 * 
 	 * @return x (the same reference) if the solution is reached.
 	 */
 	public void compute_next() throws EndOfIteration {
+		// 1)
+		double alpha = line.search(iter_vec, d);
 		
-		/* TODO */
+		// 2)
 		
 	}
 
