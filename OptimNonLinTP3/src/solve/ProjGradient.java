@@ -124,6 +124,7 @@ public class ProjGradient extends Algorithm {
 		
 		// tests
 		setDirection();
+		System.out.println(f.eval(iter_vec));
 		
 		
 		System.out.println("direction : " + d);
@@ -160,9 +161,9 @@ public class ProjGradient extends Algorithm {
 				alphaCourant = A.get_row(i).scalar(d);
 
 				if (alphaCourant != 0) {	// Ou juste différent de 0 et alpha négatif signifie que la direction n'est pas admissible ?
-					//System.out.print("alphaCourant = " +b.get(i) + " / " + alphaCourant + " = ");
+					System.out.println("aaa = " + alphaCourant);
 					alphaCourant = b.get(i) / alphaCourant;
-					//System.out.println(alphaCourant);
+					System.out.println("alphaCourant = " + alphaCourant);
 					if ((alphaCourant >= 0) && (alphaCourant < alphaMax)) {
 						alphaMax = alphaCourant;
 					}
