@@ -1,4 +1,5 @@
 package solve;
+import line.Dichotomy;
 import line.LineSearch;
 
 import java.util.ArrayList;
@@ -49,6 +50,8 @@ public class ProjGradient extends Algorithm {
 	RealFunc f;
 	// Line search
 	LineSearch line;
+	// Dichotomie pour alphaMax
+	Dichotomy dich;
 	// Le point courant
 	Vector iter_vec;
 	// Les contraintes actives
@@ -108,6 +111,7 @@ public class ProjGradient extends Algorithm {
 		this.n = A.nb_cols();
 		this.f = f;
 		this.line = l;
+		this.dich = new Dichotomy(f);
 		this.iter_vec = x0;
 		this.check_feasible(x0);
 		activeConstr = new ArrayList<Boolean>(m);
@@ -115,6 +119,15 @@ public class ProjGradient extends Algorithm {
 			activeConstr.add(i, false);
 		}
 		setActiveConstraints();
+		
+		
+		
+		// tests
+		setDirection();
+		
+		
+		System.out.println("direction : " + d);
+		System.out.println("alpha : " + rechercheEnLigne());
 	}
 	
 	/**
@@ -136,16 +149,60 @@ public class ProjGradient extends Algorithm {
 		d = f.grad(iter_vec).minus();
 	}
 	
+	private double rechercheEnLigne() {
+		double alpha, alphaMax, alphaCourant, resultat;
+		
+		alpha = line.search(iter_vec, d);
+		alphaMax = 0;
+		
+		for (int i = 0; i < m; ++i) {
+			if (!activeConstr.get(i)) {
+				alphaCourant = A.get_row(i).scalar(d);
+
+				if (alphaCourant != 0) {	// Ou juste différent de 0 et alpha négatif signifie que la direction n'est pas admissible ?
+					//System.out.print("alphaCourant = " +b.get(i) + " / " + alphaCourant + " = ");
+					alphaCourant = b.get(i) / alphaCourant;
+					//System.out.println(alphaCourant);
+					if ((alphaCourant >= 0) && (alphaCourant < alphaMax)) {
+						alphaMax = alphaCourant;
+					}
+				}
+			}
+		}
+		
+		System.out.println("alphaMax = " + alphaMax);
+			
+		if ((alpha >=0) && (alpha < alphaMax)) {
+			System.out.println("Alpha < alphaMax");
+			resultat = alpha;
+		} else if (f.eval(iter_vec.add(d.leftmul(alphaMax))) < f.eval(iter_vec)) {
+			System.out.println("alphaMax diminue f");
+			resultat = alphaMax;
+		} else {
+			System.out.println("Dichotomie nécessaire");
+			resultat = dich.search(iter_vec, d);
+		}
+		
+		return resultat;
+	}
+	
 	/**
 	 * Calculate the next iterate.
 	 * 
 	 * @return x (the same reference) if the solution is reached.
 	 */
 	public void compute_next() throws EndOfIteration {
-		// 1)
-		double alpha = line.search(iter_vec, d);
-		
-		// 2)
+		/*
+La boucle principale de la m ́ethode du gradient projet ́e (next) calculant x k+1 `a partir de x k consiste en les
+ ́etapes suivantes :
+1. Calculez une direction de descente admissible d
+2. Si d ∼ 0, calculez les multiplicateurs de Lagrange (basez-vous sur le cours).
+3. Si au moins l’un d’entre eux est n ́egatif, d ́esactivez la contrainte ayant le plus grand multiplicateur en
+valeur absolue et recommencez la proc ́edure (nouveau choix de direction d).
+4. Sinon, un minimum a  ́et ́e trouv ́e.
+5. Sinon (si d est bien diff ́erent de 0) effectuez une recherche en ligne.
+		 */
+		setDirection();
 		
 	}
 
